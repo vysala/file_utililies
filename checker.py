@@ -1,4 +1,4 @@
-from os.path import exists
+from os.path import exists, normpath
 import hashlib
 import argparse
 from yaml import load
@@ -25,10 +25,14 @@ def get_hash(f_path, method='sha1', mode='bin'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Check the target directory.')
+    parser.add_argument('dir', type=str, help='the directory to check')
     args = parser.parse_args()
 
-    checkfile = 'target/.checksums.yaml'
+    args.dir = normpath(args.dir)
+
+    checkfile = args.dir + '/.expected'
     if not exists(checkfile):
+        print("Error: a mandatory file is missing and this script can't work.")
         exit()
 
     all_digests = []
@@ -40,10 +44,11 @@ if __name__ == '__main__':
         for d in data:
             if exists(d):
                 digest = get_hash(d, mode=d[-3:])
+                print(digest, d)
                 all_digests.append(digest)
 
     h = hashlib.new('sha1')
     h.update(''.join(all_digests).encode('utf-8'))
     digest = h.hexdigest()
-    print(digest)
+    print("Final result:", digest)
 
