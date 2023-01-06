@@ -9,8 +9,6 @@ target
 ├── barrie
 │   ├── pg16.cover.jpg
 │   └── pg16.txt
-├── burgess
-│   └── pg12630.txt
 ├── carroll
 │   ├── pg11.cover.jpg
 │   ├── pg11.txt
