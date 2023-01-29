@@ -1,4 +1,4 @@
-from os.path import exists, normpath
+from os.path import exists, normpath, isdir, isfile
 import hashlib
 import argparse
 from yaml import load
@@ -30,25 +30,30 @@ if __name__ == '__main__':
 
     args.dir = normpath(args.dir)
 
-    checkfile = args.dir + '/.expected'
-    if not exists(checkfile):
-        print("Error: a mandatory file is missing and this script can't work.")
-        exit()
+    if isfile(args.dir):
+        d = args.dir
+        digest = get_hash(d, mode=d[-3:])
+        print(digest, d)
 
-    all_digests = []
-    digest = get_hash(checkfile)
-    all_digests.append(digest)
+    elif isdir(args.dir):
+        checkfile = args.dir + '/.expected'
+        if not exists(checkfile):
+            print("Error: this script can't work when used with directories other than 'target'")
+            exit()
 
-    with open(checkfile, 'rt') as stream:
-        data = load(stream, Loader=Loader)
-        for d in data:
-            if exists(d):
-                digest = get_hash(d, mode=d[-3:])
-                print(digest, d)
-                all_digests.append(digest)
+        all_digests = []
+        digest = get_hash(checkfile)
+        all_digests.append(digest)
 
-    h = hashlib.new('sha1')
-    h.update(''.join(all_digests).encode('utf-8'))
-    digest = h.hexdigest()
-    print("Final result:", digest)
+        with open(checkfile, 'rt') as stream:
+            data = load(stream, Loader=Loader)
+            for d in data:
+                if exists(d):
+                    digest = get_hash(d, mode=d[-3:])
+                    print(digest, d)
+                    all_digests.append(digest)
 
+        h = hashlib.new('sha1')
+        h.update(''.join(all_digests).encode('utf-8'))
+        digest = h.hexdigest()
+        print("Final result:", digest)
