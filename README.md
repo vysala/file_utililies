@@ -1,4 +1,4 @@
-# cs210_file_utilities
+# file_utilities
 
 A selection of titles from www.gutenberg.org
 
